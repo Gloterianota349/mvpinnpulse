@@ -5,16 +5,15 @@ import json
 import io
 import zipfile
 
-# Importações para extração de arquivos Office
+# Bibliotecas para extração de dados do Microsoft Office
 import docx2txt
 import openpyxl
 from pptx import Presentation
 
-st.set_page_config(page_title="Organizador Inteligente", page_icon="📁", layout="wide")
-st.title("Organizador Inteligente de Arquivos em Lote 📦")
-st.write("Submeta múltiplos arquivos. A IA vai renomeá-los e organizá-los em uma estrutura de pastas compactada para você.")
+st.set_page_config(page_title="Innpulse Fórum 2026 - MVP", page_icon="📁", layout="wide")
+st.title("Motor de Classificação - Innpulse Fórum 2026 📁")
+st.write("Submeta múltiplos arquivos para organização automatizada baseada na inteligência de negócio do ecossistema.")
 
-# 1. Função para extrair texto de arquivos do Office
 def extrair_texto_office(file, extensao):
     texto = ""
     try:
@@ -36,135 +35,137 @@ def extrair_texto_office(file, extensao):
                     if hasattr(shape, "text"):
                         texto += shape.text + "\n"
     except Exception as e:
-        texto = f"Erro ao extrair texto: {str(e)}"
+        texto = f"Erro na extração do arquivo Office: {str(e)}"
     return texto
 
-# 2. Upload de Múltiplos Arquivos (accept_multiple_files=True)
 uploaded_files = st.file_uploader(
-    "Arraste ou selecione todos os arquivos que deseja organizar", 
+    "Arraste ou selecione os arquivos do Innpulse Fórum", 
     type=["pdf", "png", "jpg", "jpeg", "docx", "xlsx", "pptx", "txt"],
     accept_multiple_files=True
 )
 
 if uploaded_files:
-    st.write(f"📂 **{len(uploaded_files)} arquivos carregados.**")
+    st.write(f"📂 **{len(uploaded_files)} arquivos carregados no buffer.**")
     
-    # Botão para iniciar o processamento em lote
-    if st.button("🚀 Iniciar Organização Inteligente"):
-        
-        # Configuração do cliente Gemini (pegando a chave dos Secrets do Streamlit)
+    if st.button("🚀 Executar Ingestão Inteligente"):
         client = genai.Client(api_key=st.secrets.get("GEMINI_API_KEY", "SUA_CHAVE_AQUI"))
-        
-        # Criar um buffer na memória para o arquivo ZIP
         zip_buffer = io.BytesIO()
-        
-        # Listas para exibir o resumo na tela depois
         arquivos_processados = []
         erros = []
         
-        # Barra de progresso visual do Streamlit
         progresso_barra = st.progress(0)
         status_texto = st.empty()
         
-        # Criando o arquivo ZIP dentro do buffer
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            
             for index, file in enumerate(uploaded_files):
                 nome_original = file.name
                 extensao = nome_original.split(".")[-1].lower()
                 
-                # Atualiza os componentes de progresso
-                percentual = (index + 1) / len(uploaded_files)
-                progresso_barra.progress(percentual)
-                status_texto.text(f"Analisando ({index + 1}/{len(uploaded_files)}): {nome_original}")
+                progresso_barra.progress((index + 1) / len(uploaded_files))
+                status_texto.text(f"Analisando documento ({index + 1}/{len(uploaded_files)}): {nome_original}")
                 
-                # Monta o prompt padrão para a IA
-                prompt = (
-                    f"Analise o conteúdo deste arquivo (Nome original: {nome_original}). "
-                    "Defina a subpasta ideal para ele (ex: Financeiro, RH, Contratos, Imagens, Notas_Fiscais) "
-                    "e crie um novo nome padronizado no formato AAAAMMDD_NomeDescritivo.[extensão]. "
-                    "Gere o nome baseado no assunto principal do documento. "
-                    "Responda ESTREITAMENTE em formato JSON, sem marcações markdown de código: "
-                    '{"pasta": "NOME_DA_PASTA", "novo_nome": "NOVO_NOME_DO_ARQUIVO"}'
+                # SYSTEM PROMPT EXTRAÍDO FIELMENTE DO SEU DOCUMENTO DOCX
+                prompt_sistema = (
+                    "Você é o motor de classificação de arquivos do MVP de Gestão de Conhecimento do Innpulse Fórum 2026. "
+                    "Sua tarefa é ler o conteúdo de um arquivo que foi submetido, entender seu contexto e retornar estritamente "
+                    "um objeto JSON com a classificação correta, seguindo as regras de negócio fornecidas.\n\n"
+                    "--- REGRAS DE TAXONOMIA (PASTAS) ---\n"
+                    "A pasta raiz sempre será: '01_Innpulse_Forum_2026'\n"
+                    "Você deve escolher OBRIGATORIAMENTE uma das seguintes subpastas:\n"
+                    "1. '01_Premio_Innpulse' (Se o texto focar em premiação, jurados, categorias e critérios do prêmio)\n"
+                    "2. '02_Batalha_Startups_GITR' (Se o texto focar na competição Get in the ring, pitches, ringue, chaves e duelos)\n"
+                    "3. '03_Rodada_Negocios' (Se o texto focar em matchmaking, reuniões entre corporações/investidores e startups, agendas)\n\n"
+                    "--- REGRAS DE TIPO DE DOCUMENTO ---\n"
+                    "Você deve identificar o tipo de documento baseado estritamente nestas opções:\n"
+                    "- 'Formulario_Inscricao'\n- 'Comunicacao'\n- 'Edital'\n- 'Roteiro'\n- 'Gestao_Finalistas'\n- 'Relatorio'\n\n"
+                    "--- REGRAS DE NOMENCLATURA (PADRÃO) ---\n"
+                    "O nome sugerido do arquivo deve seguir RIGOROSAMENTE o formato:\n"
+                    "YYYY_MM_DD_SubpastaSemNumero_TipoDeDocumento_Resumo_V1.[extensão_original]\n"
+                    "Notas importantes sobre a nomenclatura:\n"
+                    "- Procure no texto a data de criação ou a data do evento citada. Se não houver nenhuma data explícita no texto, utilize estritamente a data de hoje: 2026_05_21.\n"
+                    "- No campo 'SubpastaSemNumero', remova os dígitos iniciais e use apenas o termo descritivo correspondente: PremioInnpulse, BatalhaGITR, ou RodadaNegocios.\n"
+                    "- O campo 'Resumo' deve ser curto (1 a 3 palavras), utilizando formato CamelCase, sem espaços.\n\n"
+                    "--- FORMATO DE SAÍDA OBRIGATÓRIO (JSON) ---\n"
+                    "Sua resposta deve seguir exatamente este mapeamento de chaves:\n"
+                    "{\n"
+                    "  \"pasta_raiz\": \"01_Innpulse_Forum_2026\",\n"
+                    "  \"subpasta\": \"NOME_DA_SUBPASTA_ESCOLHIDA\",\n"
+                    "  \"tipo_documento\": \"TIPO_IDENTIFICADO\",\n"
+                    "  \"nome_sugerido_arquivo\": \"NOME_PADRONIZADO.ext\",\n"
+                    "  \"palavras_chave_banco_dados\": [\"termo1\", \"termo2\", \"termo3\", \"termo4\"],\n"
+                    "  \"resumo_conteudo\": \"Frase curta resumindo os dados estruturados encontrados.\"\n"
+                    "}"
                 )
                 
-                # Decide a estratégia de leitura baseada no formato do arquivo
+                # Encapsulamento multimodal ou textual conforme a extensão detectada
                 if extensao in ["pdf", "png", "jpg", "jpeg"]:
                     bytes_data = file.getvalue()
                     mime_type = f"application/{extensao}" if extensao == "pdf" else f"image/{extensao}"
                     if extensao == "jpg": mime_type = "image/jpeg"
-                    
-                    conteudo_para_ia = [
-                        types.Part.from_bytes(data=bytes_data, mime_type=mime_type),
-                        prompt
-                    ]
+                    conteudo_para_ia = [types.Part.from_bytes(data=bytes_data, mime_type=mime_type), prompt_sistema]
                 else:
-                    if extensao == "txt":
-                        texto_extraido = file.read().decode("utf-8")
-                    else:
-                        texto_extraido = extrair_texto_office(file, extensao)
-                        
-                    conteudo_para_ia = [
-                        f"Texto extraído do documento:\n{texto_extraido}\n\n",
-                        prompt
-                    ]
+                    texto_extraido = file.read().decode("utf-8") if extensao == "txt" else extrair_texto_office(file, extensao)
+                    conteudo_para_ia = [f"Texto bruto para análise do motor:\n{texto_extraido}\n\n", prompt_sistema]
                 
-                # Chamada da API do Gemini
                 try:
+                    # Executa a chamada forçando a saída tipada em JSON para evitar quebras
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
-                        contents=conteudo_para_ia
+                        contents=conteudo_para_ia,
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json"
+                        )
                     )
                     
-                    # Trata a resposta em JSON
                     resultado = json.loads(response.text.strip())
-                    pasta_destino = resultado['pasta'].strip().replace("/", "_") # Evita quebras indesejadas
-                    novo_nome = resultado['novo_nome'].strip()
                     
-                    # O truque do ZIP: Definir o caminho como "Pasta/Subpasta/Arquivo.ext" 
-                    # faz o sistema operacional criar as pastas automaticamente ao extrair!
-                    caminho_no_zip = f"{pasta_destino}/{novo_nome}"
+                    # Consome as chaves estruturadas mapeadas no documento original
+                    raiz = resultado['pasta_raiz'].strip()
+                    subpasta = resultado['subpasta'].strip()
+                    nome_final = resultado['nome_sugerido_arquivo'].strip()
                     
-                    # Salva o arquivo original com o novo nome dentro da pasta correspondente no ZIP
+                    # Gera a árvore virtual dentro do pacote binário compactado
+                    caminho_no_zip = f"{raiz}/{subpasta}/{nome_final}"
                     zip_file.writestr(caminho_no_zip, file.getvalue())
                     
                     arquivos_processados.append({
                         "original": nome_original,
-                        "novo": novo_nome,
-                        "pasta": pasta_destino
+                        "novo": nome_final,
+                        "pasta": f"{raiz}/{subpasta}",
+                        "tipo": resultado['tipo_documento'],
+                        "tags": ", ".join(resultado['palavras_chave_banco_dados']),
+                        "resumo": resultado['resumo_conteudo']
                     })
                     
                 except Exception as e:
-                    # Se um arquivo falhar, ele salva em uma pasta de erros dentro do zip para não travar o lote
-                    zip_file.writestr(f"ERROS_PROCESSAMENTO/{nome_original}", file.getvalue())
+                    # Aloca arquivos com erro em uma subpasta isolada dentro do diretório raiz do projeto
+                    zip_file.writestr(f"01_Innpulse_Forum_2026/ERROS_PROCESSAMENTO/{nome_original}", file.getvalue())
                     erros.append({"arquivo": nome_original, "erro": str(e)})
         
-        # Finaliza os indicadores de progresso
-        status_texto.success("✨ Processamento de todos os arquivos concluído!")
+        status_texto.success("✨ Processamento do lote concluído com sucesso!")
         progresso_barra.empty()
         
-        # 3. O Botão de Download do ZIP pronto
         st.write("---")
-        st.subheader("📦 Baixe sua estrutura organizada")
-        
+        st.subheader("📦 Download do Repositório Estruturado")
         st.download_button(
-            label="📥 BAIXAR PASTA ORGANIZADA (.ZIP)",
+            label="📥 BAIXAR ESTRUTURA DE PASTAS COMPLETA (.ZIP)",
             data=zip_buffer.getvalue(),
-            file_name="arquivos_organizados.zip",
+            file_name="01_Innpulse_Forum_2026.zip",
             mime="application/zip",
             use_container_width=True
         )
         
-        # 4. Relatório visual na tela para o usuário conferir
+        # Consolidação de Metadados voltada para a camada de Consulta Semântica descrita no MVP
         st.write("---")
-        st.subheader("📊 Resumo da Organização")
-        
-        if arquivos_processados:
-            st.write("#### ✅ Arquivos Alocados com Sucesso:")
-            for item in arquivos_processados:
-                st.markdown(f"🔹 **{item['original']}** ➔ Mover para `/{item['pasta']}/` como *`{item['new'] if 'new' in item else item['novo']}`*")
+        st.subheader("📊 Relatório de Metadados Extraídos (Pronto para Banco de Dados)")
+        for item in arquivos_processados:
+            with st.expander(f"📄 {item['original']} ➔ {item['novo']}"):
+                st.markdown(f"**📍 Armazenamento Direcionado:** `{item['pasta']}`")
+                st.markdown(f"**🏷️ Tipo de Documentação:** `{item['tipo']}`")
+                st.markdown(f"**🔑 Indexadores de Busca Semântica:** *{item['tags']}*")
+                st.markdown(f"**📝 Resumo do Conteúdo Encontrado:** {item['resumo']}")
                 
         if erros:
-            st.warning("#### ⚠️ Alguns arquivos apresentaram problemas e foram enviados para a pasta `/ERROS_PROCESSAMENTO/`:")
+            st.warning("⚠️ Arquivos direcionados para a pasta de contingência (/ERROS_PROCESSAMENTO/):")
             for err in erros:
-                st.write(f"❌ {err['arquivo']} (Motivo: {err['erro']})")
+                st.write(f"❌ Documento: {err['arquivo']} | Falha detectada: {err['erro']}")
