@@ -64,42 +64,36 @@ if uploaded_files:
                 progresso_barra.progress((index + 1) / len(uploaded_files))
                 status_texto.text(f"Analisando e higienizando ({index + 1}/{len(uploaded_files)}): {nome_original}")
                 
-                # PROMPT DO MOTOR CONFIGURADO COM A NOVA ESTRUTURA DO PRÊMIO INNPULSE BAHIA
+                # PROMPT ATUALIZADO COM REGRAS DE DESEMPATE RÍGIDAS
                 prompt_sistema = (
-                    "Você é o motor de inteligência documental e governança do Prêmio Innpulse Bahia (Grupo Rede+).\n"
-                    "Sua tarefa é ler o conteúdo do arquivo submetido, entender seu contexto operacional e retornar estritamente "
-                    "um objeto JSON com a classificação correta e o nome perfeitamente padronizado.\n\n"
-                    "--- 1. TAXONOMIA DE PASTAS (ESCOLHA UMA SUBPASTA SELETA) ---\n"
-                    "Você deve alocar o arquivo em uma das seguintes pastas com base na finalidade descrita:\n"
-                    "- '00_Gestao_Geral' (Governança, OKRs, atribuições, POPs, equipe)\n"
-                    "- '01_Planejamento' (Definições estratégicas, planos de ação, cronogramas macros)\n"
-                    "- '02_Metodologia_e_Regulamento' (Regras oficiais, editais, regulamentos PDF, critérios de avaliação)\n"
-                    "- '03_Comunicacao' (Identidade visual, peças, logotipos, templates e réguas de e-mail)\n"
-                    "- '04_Inscricoes' (Gestão de dados de inscritos, planilhas de inscritos, formulários)\n"
-                    "- '05_Curadoria_e_Avaliacao' (Processo de triagem, notas, baremas, listas de curadores)\n"
-                    "- '06_Entrevistas_e_Deliberacao' (Registros de bancas, transcrições, gravações, atas de deliberação)\n"
-                    "- '07_Finalistas_e_Vencedores' (Kits de finalistas, declarações de vencedores - REQUER STATUS 'Final')\n"
-                    "- '08_Cerimonia' (Produção do evento físico, roteiros, planta, checklists)\n"
-                    "- '09_Pos_Premiaçao_e_Relatorios' (Feedbacks enviados, relatórios de impacto, resultados finais)\n"
-                    "- '10_Memoria_Institucional' (Arquivo histórico, fotos, vídeos, documentos de anos anteriores - REQUER STATUS 'Final')\n"
-                    "- '99_Arquivo_Morto' (Documentos obsoletos, rascunhos descartados, versões desatualizadas)\n\n"
-                    "--- 2. REGRAS DE NOMENCLATURA PADRONIZADA ---\n"
-                    "O nome gerado deve seguir RIGOROSAMENTE o modelo: AAAA-MM-DD_Innpulse_Etapa_Tipo_Descricao_Status_VXX.[extensão]\n"
-                    "Componentes do nome:\n"
-                    "- 'AAAA-MM-DD': Data extraída do documento. Caso nenhuma data cronológica clara seja identificada, use a data corrente: 2026-05-29.\n"
-                    "- 'Innpulse': Prefixo fixo obrigatório.\n"
-                    "- 'Etapa': Nome simplificado da etapa (ex: Gestao, Planejamento, Metodologia, Comunicacao, Inscricoes, Curadoria, Entrevistas, Finalistas, Cerimonia, PosPremio, Memoria, ArquivoMorto).\n"
-                    "- 'Tipo': O tipo de documento (ex: Regulamento, Ata, Feedback, OKRs, Cronograma, Planilha, Transcricao, Roteiro, Relatorio, Template).\n"
-                    "- 'Descricao': Descrição curta do assunto em formato CamelCase (ex: Geral, DeliberacaoEducacao, EmpresaX, ListaCuradores). Sem espaços.\n"
-                    "- 'Status': Status de maturidade (ex: Rascunho, Aprovado, Final). Documentos na pasta '99_Arquivo_Morto' ou inacabados devem ser rotulados como 'Rascunho'. Pastas 07 e 10 aceitam apenas o status 'Final'.\n"
-                    "- 'VXX': Controle sequencial de versão com dois dígitos (ex: V01, V02).\n\n"
+                    "Você é um motor de classificação puramente lógico e determinístico para o Prêmio Innpulse Bahia (Grupo Rede+).\n"
+                    "Analise o arquivo e tome uma decisão baseada em regras estritas, sem espaço para variações interpretativas.\n\n"
+                    "--- 1. TAXONOMIA DE PASTAS (CRITÉRIO DE DESEMPATE SELETO) ---\n"
+                    "Escolha a pasta mais específica. Se um documento citar notas e transcrições ao mesmo tempo, a prioridade absoluta é o destino final do processo:\n"
+                    "- '00_Gestao_Geral' (Apenas governança macro, OKRs, atribuições corporativas, POPs)\n"
+                    "- '01_Planejamento' (Planos de ação, cronogramas estratégicos iniciais)\n"
+                    "- '02_Metodologia_e_Regulamento' (Regulamentos estruturados, editais oficiais publicados)\n"
+                    "- '03_Comunicacao' (Materiais visuais, e-mails de marketing, réguas de relacionamento)\n"
+                    "- '04_Inscricoes' (Dados brutos obtidos logo após o fechamento dos formulários)\n"
+                    "- '05_Curadoria_e_Avaliacao' (Listas de curadores, planilhas consolidadas de notas de triagem preliminar)\n"
+                    "- '06_Entrevistas_e_Deliberacao' (Transcrições brutas ou editadas de bancas, atas de decisões colegiadas)\n"
+                    "- '07_Finalistas_e_Vencedores' (Exclusivo para documentos com status 'Final' nomeando os ganhadores)\n"
+                    "- '08_Cerimonia' (Roteiros de palco, checklists operacionais do dia do evento físico)\n"
+                    "- '09_Pos_Premiaçao_e_Relatorios' (Relatórios pós-evento de impacto, feedbacks consolidados)\n"
+                    "- '10_Memoria_Institucional' (Materiais históricos de edições de anos anteriores)\n"
+                    "- '99_Arquivo_Morto' (Rascunhos sem uso, arquivos com a palavra 'Copiar' ou obsoletos)\n\n"
+                    "--- 2. REGRAS DE NOMENCLATURA MATEMÁTICA ---\n"
+                    "Gere o nome seguindo friamente o modelo: AAAA-MM-DD_Innpulse_Etapa_Tipo_Descricao_Status_VXX.[extensão]\n"
+                    "- Data: Use a data explícita do texto. Se houver mais de uma, adote a mais recente. Se não houver, use estritamente: 2026-05-29.\n"
+                    "- Descricao: 1 a 3 palavras em CamelCase descrevendo o assunto nuclear (ex: Geral, DeliberacaoEducacao, ListaCuradores).\n"
+                    "- Status: Escolha estritamente entre 'Rascunho', 'Aprovado' ou 'Final'. Se o documento tiver marcas de revisão, use 'Rascunho'.\n"
+                    "- VXX: Se o nome original continha números de versão (v2, v3), converta para 'V02', 'V03'. Caso contrário, use 'V01'.\n\n"
                     "--- FORMATO DE SAÍDA OBRIGATÓRIO (JSON BRUTO) ---\n"
-                    "Sua resposta deve conter exatamente esta estrutura de chaves:\n"
                     "{\n"
                     "  \"subpasta\": \"NOME_DA_PASTA_SELECIONADA\",\n"
                     "  \"nome_sugerido_arquivo\": \"NOME_PADRONIZADO.ext\",\n"
-                    "  \"palavras_chave_banco_dados\": [\"termo1\", \"termo2\", \"termo3\"],\n"
-                    "  \"resumo_conteudo\": \"Resumo executivo de alta fidelidade para busca semântica.\"\n"
+                    "  \"palavras_chave_banco_dados\": [\"termo1\", \"termo2\"],\n"
+                    "  \"resumo_conteudo\": \"Resumo executivo objetivo.\"\n"
                     "}"
                 )
                 
@@ -110,14 +104,16 @@ if uploaded_files:
                     conteudo_para_ia = [types.Part.from_bytes(data=bytes_data, mime_type=mime_type), prompt_sistema]
                 else:
                     texto_extraido = file.read().decode("utf-8") if extensao == "txt" else extrair_texto_office(file, extensao)
-                    conteudo_para_ia = [f"Conteúdo textual do documento para classificação:\n{texto_extraido}\n\n", prompt_sistema]
+                    conteudo_para_ia = [f"Conteúdo textual para classificação:\n{texto_extraido}\n\n", prompt_sistema]
                 
                 try:
+                    # CHAMADA CONFIGURADA COM TEMPERATURE = 0.0
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=conteudo_para_ia,
                         config=types.GenerateContentConfig(
-                            response_mime_type="application/json"
+                            response_mime_type="application/json",
+                            temperature=0.0
                         )
                     )
                     
@@ -125,7 +121,6 @@ if uploaded_files:
                     subpasta_destino = resultado['subpasta'].strip()
                     nome_final = resultado['nome_sugerido_arquivo'].strip()
                     
-                    # Montagem da estrutura física de diretórios dentro do ZIP de saída
                     caminho_no_zip = f"{subpasta_destino}/{nome_final}"
                     zip_file.writestr(caminho_no_zip, file.getvalue())
                     
@@ -138,11 +133,10 @@ if uploaded_files:
                     })
                     
                 except Exception as e:
-                    # Rota de contingência para falhas: envia para o Arquivo Morto em subpasta de erros
                     zip_file.writestr(f"99_Arquivo_Morto/ERROS_PLUG_AND_PLAY/{nome_original}", file.getvalue())
                     erros.append({"arquivo": nome_original, "erro": str(e)})
         
-        status_texto.success("✨ Processamento e triagem do lote finalizados!")
+        status_texto.success("✨ Processamento estável do lote finalizado!")
         progresso_barra.empty()
         
         st.write("---")
