@@ -1,0 +1,6 @@
+Plaintext
+streamlit
+google-genai
+docx2txt
+openpyxl
+python-pptx
