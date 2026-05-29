@@ -10,9 +10,9 @@ import docx2txt
 import openpyxl
 from pptx import Presentation
 
-st.set_page_config(page_title="Innpulse Fórum 2026 - MVP", page_icon="📁", layout="wide")
-st.title("Motor de Classificação - Innpulse Fórum 2026 📁")
-st.write("Submeta múltiplos arquivos para organização automatizada baseada na inteligência de negócio do ecossistema.")
+st.set_page_config(page_title="Prêmio Innpulse Bahia - Gestão Documental", page_icon="📁", layout="wide")
+st.title("Sistema Inteligente de Governança Documental - Prêmio Innpulse Bahia 📁")
+st.write("Organização escalável, padronizada e de alta conscienciosidade para o ecossistema do Grupo Rede+.")
 
 def extrair_texto_office(file, extensao):
     texto = ""
@@ -39,15 +39,15 @@ def extrair_texto_office(file, extensao):
     return texto
 
 uploaded_files = st.file_uploader(
-    "Arraste ou selecione os arquivos do Innpulse Fórum", 
+    "Arraste ou selecione os arquivos para processamento e triagem estruturada no OneDrive", 
     type=["pdf", "png", "jpg", "jpeg", "docx", "xlsx", "pptx", "txt"],
     accept_multiple_files=True
 )
 
 if uploaded_files:
-    st.write(f"📂 **{len(uploaded_files)} arquivos carregados no buffer.**")
+    st.write(f"📂 **{len(uploaded_files)} arquivos carregados prontos para organização.**")
     
-    if st.button("🚀 Executar Ingestão Inteligente"):
+    if st.button("🚀 Executar Governança Documental"):
         client = genai.Client(api_key=st.secrets.get("GEMINI_API_KEY", "SUA_CHAVE_AQUI"))
         zip_buffer = io.BytesIO()
         arquivos_processados = []
@@ -62,42 +62,47 @@ if uploaded_files:
                 extensao = nome_original.split(".")[-1].lower()
                 
                 progresso_barra.progress((index + 1) / len(uploaded_files))
-                status_texto.text(f"Analisando documento ({index + 1}/{len(uploaded_files)}): {nome_original}")
+                status_texto.text(f"Analisando e higienizando ({index + 1}/{len(uploaded_files)}): {nome_original}")
                 
-                # SYSTEM PROMPT EXTRAÍDO FIELMENTE DO SEU DOCUMENTO DOCX
+                # PROMPT DO MOTOR CONFIGURADO COM A NOVA ESTRUTURA DO PRÊMIO INNPULSE BAHIA
                 prompt_sistema = (
-                    "Você é o motor de classificação de arquivos do MVP de Gestão de Conhecimento do Innpulse Fórum 2026. "
-                    "Sua tarefa é ler o conteúdo de um arquivo que foi submetido, entender seu contexto e retornar estritamente "
-                    "um objeto JSON com a classificação correta, seguindo as regras de negócio fornecidas.\n\n"
-                    "--- REGRAS DE TAXONOMIA (PASTAS) ---\n"
-                    "A pasta raiz sempre será: '01_Innpulse_Forum_2026'\n"
-                    "Você deve escolher OBRIGATORIAMENTE uma das seguintes subpastas:\n"
-                    "1. '01_Premio_Innpulse' (Se o texto focar em premiação, jurados, categorias e critérios do prêmio)\n"
-                    "2. '02_Batalha_Startups_GITR' (Se o texto focar na competição Get in the ring, pitches, ringue, chaves e duelos)\n"
-                    "3. '03_Rodada_Negocios' (Se o texto focar em matchmaking, reuniões entre corporações/investidores e startups, agendas)\n\n"
-                    "--- REGRAS DE TIPO DE DOCUMENTO ---\n"
-                    "Você deve identificar o tipo de documento baseado estritamente nestas opções:\n"
-                    "- 'Formulario_Inscricao'\n- 'Comunicacao'\n- 'Edital'\n- 'Roteiro'\n- 'Gestao_Finalistas'\n- 'Relatorio'\n\n"
-                    "--- REGRAS DE NOMENCLATURA (PADRÃO) ---\n"
-                    "O nome sugerido do arquivo deve seguir RIGOROSAMENTE o formato:\n"
-                    "YYYY_MM_DD_SubpastaSemNumero_TipoDeDocumento_Resumo_V1.[extensão_original]\n"
-                    "Notas importantes sobre a nomenclatura:\n"
-                    "- Procure no texto a data de criação ou a data do evento citada. Se não houver nenhuma data explícita no texto, utilize estritamente a data de hoje: 2026_05_21.\n"
-                    "- No campo 'SubpastaSemNumero', remova os dígitos iniciais e use apenas o termo descritivo correspondente: PremioInnpulse, BatalhaGITR, ou RodadaNegocios.\n"
-                    "- O campo 'Resumo' deve ser curto (1 a 3 palavras), utilizando formato CamelCase, sem espaços.\n\n"
-                    "--- FORMATO DE SAÍDA OBRIGATÓRIO (JSON) ---\n"
-                    "Sua resposta deve seguir exatamente este mapeamento de chaves:\n"
+                    "Você é o motor de inteligência documental e governança do Prêmio Innpulse Bahia (Grupo Rede+).\n"
+                    "Sua tarefa é ler o conteúdo do arquivo submetido, entender seu contexto operacional e retornar estritamente "
+                    "um objeto JSON com a classificação correta e o nome perfeitamente padronizado.\n\n"
+                    "--- 1. TAXONOMIA DE PASTAS (ESCOLHA UMA SUBPASTA SELETA) ---\n"
+                    "Você deve alocar o arquivo em uma das seguintes pastas com base na finalidade descrita:\n"
+                    "- '00_Gestao_Geral' (Governança, OKRs, atribuições, POPs, equipe)\n"
+                    "- '01_Planejamento' (Definições estratégicas, planos de ação, cronogramas macros)\n"
+                    "- '02_Metodologia_e_Regulamento' (Regras oficiais, editais, regulamentos PDF, critérios de avaliação)\n"
+                    "- '03_Comunicacao' (Identidade visual, peças, logotipos, templates e réguas de e-mail)\n"
+                    "- '04_Inscricoes' (Gestão de dados de inscritos, planilhas de inscritos, formulários)\n"
+                    "- '05_Curadoria_e_Avaliacao' (Processo de triagem, notas, baremas, listas de curadores)\n"
+                    "- '06_Entrevistas_e_Deliberacao' (Registros de bancas, transcrições, gravações, atas de deliberação)\n"
+                    "- '07_Finalistas_e_Vencedores' (Kits de finalistas, declarações de vencedores - REQUER STATUS 'Final')\n"
+                    "- '08_Cerimonia' (Produção do evento físico, roteiros, planta, checklists)\n"
+                    "- '09_Pos_Premiaçao_e_Relatorios' (Feedbacks enviados, relatórios de impacto, resultados finais)\n"
+                    "- '10_Memoria_Institucional' (Arquivo histórico, fotos, vídeos, documentos de anos anteriores - REQUER STATUS 'Final')\n"
+                    "- '99_Arquivo_Morto' (Documentos obsoletos, rascunhos descartados, versões desatualizadas)\n\n"
+                    "--- 2. REGRAS DE NOMENCLATURA PADRONIZADA ---\n"
+                    "O nome gerado deve seguir RIGOROSAMENTE o modelo: AAAA-MM-DD_Innpulse_Etapa_Tipo_Descricao_Status_VXX.[extensão]\n"
+                    "Componentes do nome:\n"
+                    "- 'AAAA-MM-DD': Data extraída do documento. Caso nenhuma data cronológica clara seja identificada, use a data corrente: 2026-05-29.\n"
+                    "- 'Innpulse': Prefixo fixo obrigatório.\n"
+                    "- 'Etapa': Nome simplificado da etapa (ex: Gestao, Planejamento, Metodologia, Comunicacao, Inscricoes, Curadoria, Entrevistas, Finalistas, Cerimonia, PosPremio, Memoria, ArquivoMorto).\n"
+                    "- 'Tipo': O tipo de documento (ex: Regulamento, Ata, Feedback, OKRs, Cronograma, Planilha, Transcricao, Roteiro, Relatorio, Template).\n"
+                    "- 'Descricao': Descrição curta do assunto em formato CamelCase (ex: Geral, DeliberacaoEducacao, EmpresaX, ListaCuradores). Sem espaços.\n"
+                    "- 'Status': Status de maturidade (ex: Rascunho, Aprovado, Final). Documentos na pasta '99_Arquivo_Morto' ou inacabados devem ser rotulados como 'Rascunho'. Pastas 07 e 10 aceitam apenas o status 'Final'.\n"
+                    "- 'VXX': Controle sequencial de versão com dois dígitos (ex: V01, V02).\n\n"
+                    "--- FORMATO DE SAÍDA OBRIGATÓRIO (JSON BRUTO) ---\n"
+                    "Sua resposta deve conter exatamente esta estrutura de chaves:\n"
                     "{\n"
-                    "  \"pasta_raiz\": \"01_Innpulse_Forum_2026\",\n"
-                    "  \"subpasta\": \"NOME_DA_SUBPASTA_ESCOLHIDA\",\n"
-                    "  \"tipo_documento\": \"TIPO_IDENTIFICADO\",\n"
+                    "  \"subpasta\": \"NOME_DA_PASTA_SELECIONADA\",\n"
                     "  \"nome_sugerido_arquivo\": \"NOME_PADRONIZADO.ext\",\n"
-                    "  \"palavras_chave_banco_dados\": [\"termo1\", \"termo2\", \"termo3\", \"termo4\"],\n"
-                    "  \"resumo_conteudo\": \"Frase curta resumindo os dados estruturados encontrados.\"\n"
+                    "  \"palavras_chave_banco_dados\": [\"termo1\", \"termo2\", \"termo3\"],\n"
+                    "  \"resumo_conteudo\": \"Resumo executivo de alta fidelidade para busca semântica.\"\n"
                     "}"
                 )
                 
-                # Encapsulamento multimodal ou textual conforme a extensão detectada
                 if extensao in ["pdf", "png", "jpg", "jpeg"]:
                     bytes_data = file.getvalue()
                     mime_type = f"application/{extensao}" if extensao == "pdf" else f"image/{extensao}"
@@ -105,10 +110,9 @@ if uploaded_files:
                     conteudo_para_ia = [types.Part.from_bytes(data=bytes_data, mime_type=mime_type), prompt_sistema]
                 else:
                     texto_extraido = file.read().decode("utf-8") if extensao == "txt" else extrair_texto_office(file, extensao)
-                    conteudo_para_ia = [f"Texto bruto para análise do motor:\n{texto_extraido}\n\n", prompt_sistema]
+                    conteudo_para_ia = [f"Conteúdo textual do documento para classificação:\n{texto_extraido}\n\n", prompt_sistema]
                 
                 try:
-                    # Executa a chamada forçando a saída tipada em JSON para evitar quebras
                     response = client.models.generate_content(
                         model='gemini-2.5-flash',
                         contents=conteudo_para_ia,
@@ -118,54 +122,48 @@ if uploaded_files:
                     )
                     
                     resultado = json.loads(response.text.strip())
-                    
-                    # Consome as chaves estruturadas mapeadas no documento original
-                    raiz = resultado['pasta_raiz'].strip()
-                    subpasta = resultado['subpasta'].strip()
+                    subpasta_destino = resultado['subpasta'].strip()
                     nome_final = resultado['nome_sugerido_arquivo'].strip()
                     
-                    # Gera a árvore virtual dentro do pacote binário compactado
-                    caminho_no_zip = f"{raiz}/{subpasta}/{nome_final}"
+                    # Montagem da estrutura física de diretórios dentro do ZIP de saída
+                    caminho_no_zip = f"{subpasta_destino}/{nome_final}"
                     zip_file.writestr(caminho_no_zip, file.getvalue())
                     
                     arquivos_processados.append({
                         "original": nome_original,
                         "novo": nome_final,
-                        "pasta": f"{raiz}/{subpasta}",
-                        "tipo": resultado['tipo_documento'],
+                        "pasta": subpasta_destino,
                         "tags": ", ".join(resultado['palavras_chave_banco_dados']),
                         "resumo": resultado['resumo_conteudo']
                     })
                     
                 except Exception as e:
-                    # Aloca arquivos com erro em uma subpasta isolada dentro do diretório raiz do projeto
-                    zip_file.writestr(f"01_Innpulse_Forum_2026/ERROS_PROCESSAMENTO/{nome_original}", file.getvalue())
+                    # Rota de contingência para falhas: envia para o Arquivo Morto em subpasta de erros
+                    zip_file.writestr(f"99_Arquivo_Morto/ERROS_PLUG_AND_PLAY/{nome_original}", file.getvalue())
                     erros.append({"arquivo": nome_original, "erro": str(e)})
         
-        status_texto.success("✨ Processamento do lote concluído com sucesso!")
+        status_texto.success("✨ Processamento e triagem do lote finalizados!")
         progresso_barra.empty()
         
         st.write("---")
-        st.subheader("📦 Download do Repositório Estruturado")
+        st.subheader("📦 Download da Estrutura de Pastas do OneDrive")
         st.download_button(
-            label="📥 BAIXAR ESTRUTURA DE PASTAS COMPLETA (.ZIP)",
+            label="📥 BAIXAR REPOSITÓRIO HIGIENIZADO DO PRÊMIO (.ZIP)",
             data=zip_buffer.getvalue(),
-            file_name="01_Innpulse_Forum_2026.zip",
+            file_name="Premio_Innpulse_Bahia_Organizado.zip",
             mime="application/zip",
             use_container_width=True
         )
         
-        # Consolidação de Metadados voltada para a camada de Consulta Semântica descrita no MVP
         st.write("---")
-        st.subheader("📊 Relatório de Metadados Extraídos (Pronto para Banco de Dados)")
+        st.subheader("📊 Diagnóstico Semântico e Metadados de Governança")
         for item in arquivos_processados:
             with st.expander(f"📄 {item['original']} ➔ {item['novo']}"):
-                st.markdown(f"**📍 Armazenamento Direcionado:** `{item['pasta']}`")
-                st.markdown(f"**🏷️ Tipo de Documentação:** `{item['tipo']}`")
-                st.markdown(f"**🔑 Indexadores de Busca Semântica:** *{item['tags']}*")
-                st.markdown(f"**📝 Resumo do Conteúdo Encontrado:** {item['resumo']}")
+                st.markdown(f"**📍 Subpasta de Destino (OneDrive):** `{item['pasta']}`")
+                st.markdown(f"**🔑 Indexadores Extraídos:** *{item['tags']}*")
+                st.markdown(f"**📝 Resumo Analítico:** {item['resumo']}")
                 
         if erros:
-            st.warning("⚠️ Arquivos direcionados para a pasta de contingência (/ERROS_PROCESSAMENTO/):")
+            st.warning("⚠️ Documentos direcionados para a contingência (/99_Arquivo_Morto/ERROS_PLUG_AND_PLAY/):")
             for err in erros:
-                st.write(f"❌ Documento: {err['arquivo']} | Falha detectada: {err['erro']}")
+                st.write(f"❌ Arquivo: {err['arquivo']} | Detalhes do erro: {err['erro']}")
